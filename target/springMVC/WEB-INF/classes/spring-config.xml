@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <context:annotation-config />
+    <context:component-scan base-package="com.thoughtworks.iamcoach.pos"/>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/management"/>
+        <property name="username" value="pos"/>
+        <property name="password" value="123"/>
+    </bean>
+    <bean id="simpleJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    <bean id="itemDaoImpl" class="com.thoughtworks.iamcoach.pos.dao.ItemDaoImpl">
+        <constructor-arg ref="simpleJdbcTemplate"/>
+    </bean>
+    <bean id="itemServiceImpl" class="com.thoughtworks.iamcoach.pos.service.ItemServiceImpl">
+        <constructor-arg ref="itemDaoImpl"/>
+    </bean>
+    <bean id="scanner" class="com.thoughtworks.iamcoach.pos.service.Scanner">
+    </bean>
+    <bean id="cart" class="com.thoughtworks.iamcoach.pos.service.Cart">
+        <constructor-arg ref="itemServiceImpl"/>
+        <constructor-arg ref="scanner"/>
+    </bean>
+    <bean id="categoryDaoImpl" class="com.thoughtworks.iamcoach.pos.dao.CategoryDaoImpl">
+        <constructor-arg ref="simpleJdbcTemplate"/>
+    </bean>
+    <bean id="categoryServiceImpl" class="com.thoughtworks.iamcoach.pos.service.CategoryServiceImpl">
+        <constructor-arg ref="categoryDaoImpl"/>
+    </bean>
+
+    <bean id="printer" class="Printer">
+        <constructor-arg ref="cart"/>
+        <constructor-arg ref="categoryServiceImpl"/>
+    </bean>
+
+</beans>
